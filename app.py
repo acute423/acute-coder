@@ -189,48 +189,7 @@ if PLOTLY_AVAILABLE and 'State' in df.columns:
     if STREAMLIT_AVAILABLE:
         st.plotly_chart(fig_map,use_container_width=True)
 
-# ---------------------------
-# 9️⃣ PDF Report Generation
-# ---------------------------
-st.header("Step 7: Generate PDF Report")
 
-if st.button("Generate PDF"):
-    from fpdf import FPDF
-
-    pdf = FPDF()
-    pdf.add_page()
-    pdf.set_font("Arial", size=12)
-    
-    # Title
-    pdf.cell(0, 10, "Aadhaar Analytics Report", ln=True, align="C")
-    pdf.ln(5)
-    
-    # Selected state info
-    pdf.cell(0, 10, f"State: {selected_state}", ln=True)
-    pdf.ln(5)
-    
-    # Add data rows from the filtered dataframe
-    for idx, row in state_df.iterrows():
-        pdf.cell(
-            0, 10,
-            f"{row['Year']}-{row['Month']}: Enrolments={row['Enrolments']}, Updates={row['Updates']}, Anomaly={row['anomaly']}",
-            ln=True
-        )
-    
-    # Save the PDF to a temporary file
-    filename = f"{selected_state}_aadhaar_report.pdf"
-    pdf.output(filename)
-    
-    st.success(f"✅ PDF generated: {filename}")
-
-    # Add download button
-    with open(filename, "rb") as f:
-        st.download_button(
-            label="📥 Download PDF",
-            data=f,
-            file_name=filename,
-            mime="application/pdf"
-        )
 
 
 # ---------------- UIDAI Dataset Guide ----------------
