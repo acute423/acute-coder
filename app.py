@@ -189,16 +189,49 @@ if PLOTLY_AVAILABLE and 'State' in df.columns:
     if STREAMLIT_AVAILABLE:
         st.plotly_chart(fig_map,use_container_width=True)
 
-# ---------------- PDF Report ----------------
-if PDF_AVAILABLE:
-    pdf=FPDF()
+# ---------------------------
+# 9️⃣ PDF Report Generation
+# ---------------------------
+st.header("Step 7: Generate PDF Report")
+
+if st.button("Generate PDF"):
+    from fpdf import FPDF
+
+    pdf = FPDF()
     pdf.add_page()
-    pdf.set_font("Arial",size=10)
-    pdf.cell(0,10,"Hackathon Aadhaar Analytics Report",ln=True)
-    pdf.cell(0,8,f"R2 Score: {round(r2,3)}",ln=True)
-    pdf.cell(0,8,f"Anomalies Detected: {len(anomalies)}",ln=True)
-    pdf.output("aadhaar_report.pdf")
-    ui_write("📄 PDF report generated")
+    pdf.set_font("Arial", size=12)
+    
+    # Title
+    pdf.cell(0, 10, "Aadhaar Analytics Report", ln=True, align="C")
+    pdf.ln(5)
+    
+    # Selected state info
+    pdf.cell(0, 10, f"State: {selected_state}", ln=True)
+    pdf.ln(5)
+    
+    # Add data rows from the filtered dataframe
+    for idx, row in state_df.iterrows():
+        pdf.cell(
+            0, 10,
+            f"{row['Year']}-{row['Month']}: Enrolments={row['Enrolments']}, Updates={row['Updates']}, Anomaly={row['anomaly']}",
+            ln=True
+        )
+    
+    # Save the PDF to a temporary file
+    filename = f"{selected_state}_aadhaar_report.pdf"
+    pdf.output(filename)
+    
+    st.success(f"✅ PDF generated: {filename}")
+
+    # Add download button
+    with open(filename, "rb") as f:
+        st.download_button(
+            label="📥 Download PDF",
+            data=f,
+            file_name=filename,
+            mime="application/pdf"
+        )
+
 
 # ---------------- UIDAI Dataset Guide ----------------
 ui_write("📡 Real UIDAI Dataset Integration")
